@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # AutoForge main application
+  seaforge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seaforge
+    ports:
+      - "8888:8888"
+      - "5173:5173"
+    environment:
+      # Provider selection (auto, ollama, openrouter, openai)
+      - AUTOFORGE_PROVIDER=${AUTOFORGE_PROVIDER:-auto}
+      
+      # OpenRouter configuration
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_MODEL=${OPENROUTER_MODEL:-anthropic/claude-3.5-sonnet}
+      
+      # Ollama configuration (points to ollama service)
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-codellama:13b}
+      
+      # OpenAI configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4-turbo}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-https://api.openai.com/v1}
+      
+      # Server settings
+      - AUTOFORGE_HOST=0.0.0.0
+      - AUTOFORGE_PORT=8888
+      
+      # Optional integrations
+      - PROGRESS_N8N_WEBHOOK_URL=${PROGRESS_N8N_WEBHOOK_URL:-}
+    
+    volumes:
+      # Persist generated projects
+      - ./generations:/app/generations
+      
+      # Optional: Mount custom config file
+      - ./seaforge.yaml:/app/seaforge.yaml:ro
+    
+    depends_on:
+      - ollama
+    
+    restart: unless-stopped
+    
+    networks:
+      - seaforge-network
+
+  # Ollama service for local LLM models
+  ollama:
+    image: ollama/ollama:latest
+    container_name: seaforge-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    
+    restart: unless-stopped
+    
+    networks:
+      - seaforge-network
+    
+    # Optional: GPU support (uncomment if you have NVIDIA GPU)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+volumes:
+  ollama-data:
+    driver: local
+
+networks:
+  seaforge-network:
+    driver: bridge

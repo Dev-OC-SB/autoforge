@@ -15,17 +15,17 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from auth import is_auth_error, print_auth_error_help
+from core.auth import is_auth_error, print_auth_error_help
 
 # Load environment variables from .env file if present
 load_dotenv()
 
-from prompts import (
+from core.prompts import (
     get_project_prompts_dir,
     has_project_prompts,
     scaffold_project_prompts,
 )
-from registry import (
+from core.registry import (
     get_project_path,
     list_registered_projects,
     register_project,
@@ -82,7 +82,7 @@ def get_existing_projects() -> list[tuple[str, Path]]:
 def display_menu(projects: list[tuple[str, Path]]) -> None:
     """Display the main menu."""
     print("\n" + "=" * 50)
-    print("  AutoForge - Autonomous Coding Agent")
+    print("  SeaForge - Autonomous Coding Agent")
     print("=" * 50)
     print("\n[1] Create new project")
 
@@ -391,7 +391,7 @@ def run_agent(project_name: str, project_dir: Path) -> None:
     print("-" * 50)
 
     # Build the command - pass absolute path and model from settings
-    from registry import DEFAULT_MODEL, get_all_settings
+    from core.registry import DEFAULT_MODEL, get_all_settings
     settings = get_all_settings()
     model = settings.get("api_model") or settings.get("model", DEFAULT_MODEL)
     cmd = [sys.executable, "autonomous_agent_demo.py", "--project-dir", str(project_dir.resolve()), "--model", model]

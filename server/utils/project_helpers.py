@@ -16,7 +16,8 @@ _root = Path(__file__).parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from registry import get_project_path as _registry_get_project_path
+from core.registry import get_project_path as _registry_get_project_path
+from core.registry import Project
 
 
 def get_project_path(project_name: str) -> Path | None:
@@ -30,3 +31,16 @@ def get_project_path(project_name: str) -> Path | None:
         project is not found in the registry.
     """
     return _registry_get_project_path(project_name)
+
+
+def get_project_by_name(project_name: str, db) -> Project | None:
+    """Get a project from the database by name.
+
+    Args:
+        project_name: The registered name of the project.
+        db: Database session.
+
+    Returns:
+        The Project object, or None if not found.
+    """
+    return db.query(Project).filter(Project.name == project_name).first()

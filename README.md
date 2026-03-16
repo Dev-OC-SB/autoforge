@@ -1,8 +1,10 @@
-# AutoForge
+# SeaForge
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/leonvanzyl)
 
-A long-running autonomous coding agent powered by the Claude Agent SDK. This tool can build complete applications over multiple sessions using a two-agent pattern (initializer + coding agent). Includes a React-based UI for monitoring progress in real-time.
+A long-running autonomous coding agent that can build complete applications over multiple sessions using a two-agent pattern (initializer + coding agent). Includes a React-based UI for monitoring progress in real-time.
+
+**🆕 Now supports multiple LLM providers:** Ollama (local/free), OpenRouter (cloud/multi-model), OpenAI, and Claude Code CLI.
 
 ## Video Tutorial
 
@@ -16,26 +18,64 @@ A long-running autonomous coding agent powered by the Claude Agent SDK. This too
 
 - **Node.js 20+** - Required for the CLI
 - **Python 3.11+** - Auto-detected on first run ([download](https://www.python.org/downloads/))
-- **Claude Code CLI** - Install and authenticate (see below)
+- **LLM Provider** - Choose one of the following:
 
-### Claude Code CLI (Required)
+### Provider Options
+
+SeaForge supports multiple LLM providers. Choose the one that best fits your needs:
+
+#### Option 1: Ollama (Recommended for Local/Free)
+
+**Best for:** Privacy, offline work, no API costs
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Pull a coding model
+ollama pull codellama:13b
+```
+
+No API key needed! SeaForge will auto-detect Ollama.
+
+#### Option 2: OpenRouter (Recommended for Cloud)
+
+**Best for:** Access to Claude, GPT-4, Gemini, and more
+
+1. Sign up at https://openrouter.ai
+2. Get your API key
+3. Set environment variable:
+```bash
+export OPENROUTER_API_KEY=sk-or-v1-your-key-here
+```
+
+#### Option 3: OpenAI
+
+**Best for:** Direct OpenAI access
+
+1. Get API key from https://platform.openai.com
+2. Set environment variable:
+```bash
+export OPENAI_API_KEY=sk-your-key-here
+```
+
+#### Option 4: Claude Code CLI (Legacy)
+
+**Note:** Claude Code CLI is now optional. The new adapter system provides more flexibility.
 
 **macOS / Linux:**
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
+claude login
 ```
 
 **Windows (PowerShell):**
 ```powershell
 irm https://claude.ai/install.ps1 | iex
+claude login
 ```
 
-### Authentication
-
-You need one of the following:
-
-- **Claude Pro/Max Subscription** - Use `claude login` to authenticate (recommended)
-- **Anthropic API Key** - Pay-per-use from https://console.anthropic.com/
+**📚 See [PROVIDERS.md](PROVIDERS.md) for detailed provider comparison and setup.**
 
 ---
 
@@ -44,39 +84,39 @@ You need one of the following:
 ### Option 1: npm Install (Recommended)
 
 ```bash
-npm install -g autoforge-ai
-autoforge
+npm install -g seaforge-ai
+seaforge
 ```
 
-On first run, AutoForge automatically:
+On first run, SeaForge automatically:
 1. Checks for Python 3.11+
-2. Creates a virtual environment at `~/.autoforge/venv/`
+2. Creates a virtual environment at `~/.seaforge/venv/`
 3. Installs Python dependencies
-4. Copies a default config file to `~/.autoforge/.env`
+4. Copies a default config file to `~/.seaforge/.env`
 5. Starts the server and opens your browser
 
 ### CLI Commands
 
 ```
-autoforge                       Start the server (default)
-autoforge config                Open ~/.autoforge/.env in $EDITOR
-autoforge config --path         Print config file path
-autoforge config --show         Show active configuration values
-autoforge --port PORT           Custom port (default: auto from 8888)
-autoforge --host HOST           Custom host (default: 127.0.0.1)
-autoforge --no-browser          Don't auto-open browser
-autoforge --repair              Delete and recreate virtual environment
-autoforge --version             Print version
-autoforge --help                Show help
+seaforge                       Start the server (default)
+seaforge config                Open ~/.seaforge/.env in $EDITOR
+seaforge config --path         Print config file path
+seaforge config --show         Show active configuration values
+seaforge --port PORT           Custom port (default: auto from 8888)
+seaforge --host HOST           Custom host (default: 127.0.0.1)
+seaforge --no-browser          Don't auto-open browser
+seaforge --repair              Delete and recreate virtual environment
+seaforge --version             Print version
+seaforge --help                Show help
 ```
 
 ### Option 2: From Source (Development)
 
-Clone the repository and use the start scripts directly. This is the recommended path if you want to contribute or modify AutoForge itself.
+Clone the repository and use the start scripts directly. This is the recommended path if you want to contribute or modify SeaForge itself.
 
 ```bash
-git clone https://github.com/leonvanzyl/autoforge.git
-cd autoforge
+git clone https://github.com/leonvanzyl/seaforge.git
+cd seaforge
 ```
 
 **Web UI:**
@@ -160,7 +200,7 @@ Features are stored in SQLite via SQLAlchemy and managed through an MCP server t
 ## Project Structure
 
 ```
-autoforge/
+seaforge/
 ├── bin/                         # npm CLI entry point
 ├── lib/                         # CLI bootstrap and setup logic
 ├── start.py                     # CLI menu and project management
@@ -295,14 +335,14 @@ The UI receives live updates via WebSocket (`/ws/projects/{project_name}`):
 
 ## Configuration
 
-AutoForge reads configuration from a `.env` file. The file location depends on how you installed AutoForge:
+SeaForge reads configuration from a `.env` file. The file location depends on how you installed SeaForge:
 
 | Install method | Config file location | Edit command |
 |---|---|---|
-| npm (global) | `~/.autoforge/.env` | `autoforge config` |
+| npm (global) | `~/.seaforge/.env` | `seaforge config` |
 | From source | `.env` in the project root | Edit directly |
 
-A default config file is created automatically on first run. Use `autoforge config` to open it in your editor, or `autoforge config --show` to print the active values.
+A default config file is created automatically on first run. Use `seaforge config` to open it in your editor, or `seaforge config --show` to print the active values.
 
 ### N8N Webhook Integration
 
@@ -385,11 +425,11 @@ Install Python 3.11 or later from [python.org](https://www.python.org/downloads/
 **"Python venv module not available"**
 On Debian/Ubuntu, the venv module is packaged separately. Install it with `sudo apt install python3.XX-venv` (replace `XX` with your Python minor version, e.g., `python3.12-venv`).
 
-**"AutoForge is already running"**
+**"SeaForge is already running"**
 A server instance is already active. Use the browser URL shown in the terminal, or stop the existing instance with Ctrl+C first.
 
 **Virtual environment issues after a Python upgrade**
-Run `autoforge --repair` to delete and recreate the virtual environment from scratch.
+Run `seaforge --repair` to delete and recreate the virtual environment from scratch.
 
 ---
 

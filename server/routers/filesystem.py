@@ -15,7 +15,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, Query
 
-from security import SENSITIVE_DIRECTORIES
+from core.security import SENSITIVE_DIRECTORIES
 
 # Module logger
 logger = logging.getLogger(__name__)

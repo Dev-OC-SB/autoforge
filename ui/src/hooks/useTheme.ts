@@ -52,8 +52,8 @@ export const THEMES: ThemeOption[] = [
   }
 ]
 
-const THEME_STORAGE_KEY = 'autoforge-theme'
-const DARK_MODE_STORAGE_KEY = 'autoforge-dark-mode'
+const THEME_STORAGE_KEY = 'seaforge-theme'
+const DARK_MODE_STORAGE_KEY = 'seaforge-dark-mode'
 
 function getThemeClass(themeId: ThemeId): string {
   switch (themeId) {

@@ -18,7 +18,7 @@ _root = Path(__file__).parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from registry import DEFAULT_MODEL, VALID_MODELS
+from core.registry import DEFAULT_MODEL, VALID_MODELS
 
 # ============================================================================
 # Project Schemas
@@ -217,7 +217,7 @@ class AgentStartRequest(BaseModel):
     def validate_model(cls, v: str | None) -> str | None:
         """Validate model is in the allowed list (Claude) or allow any model for alternative providers."""
         if v is not None and v not in VALID_MODELS:
-            from registry import get_all_settings
+            from core.registry import get_all_settings
             settings = get_all_settings()
             if settings.get("api_provider", "claude") == "claude":
                 raise ValueError(f"Invalid model. Must be one of: {VALID_MODELS}")
@@ -602,7 +602,7 @@ class ScheduleCreate(BaseModel):
     def validate_model(cls, v: str | None) -> str | None:
         """Validate model is in the allowed list (Claude) or allow any model for alternative providers."""
         if v is not None and v not in VALID_MODELS:
-            from registry import get_all_settings
+            from core.registry import get_all_settings
             settings = get_all_settings()
             if settings.get("api_provider", "claude") == "claude":
                 raise ValueError(f"Invalid model. Must be one of: {VALID_MODELS}")
@@ -627,7 +627,7 @@ class ScheduleUpdate(BaseModel):
     def validate_model(cls, v: str | None) -> str | None:
         """Validate model is in the allowed list (Claude) or allow any model for alternative providers."""
         if v is not None and v not in VALID_MODELS:
-            from registry import get_all_settings
+            from core.registry import get_all_settings
             settings = get_all_settings()
             if settings.get("api_provider", "claude") == "claude":
                 raise ValueError(f"Invalid model. Must be one of: {VALID_MODELS}")

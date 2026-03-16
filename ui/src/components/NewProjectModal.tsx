@@ -402,7 +402,7 @@ export function NewProjectModal({
                         <div className="flex-1">
                           <span className="font-semibold">Blank Project</span>
                           <p className="text-sm text-muted-foreground mt-1">
-                            Start from scratch. AutoForge will scaffold your app based on the spec you define.
+                            Start from scratch. SeaForge will scaffold your app based on the spec you define.
                           </p>
                         </div>
                       </div>

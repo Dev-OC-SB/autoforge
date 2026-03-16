@@ -29,12 +29,15 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from .routers import (
+    a2a_router,
     agent_router,
     assistant_chat_router,
     devserver_router,
     expand_project_router,
+    external_agents_router,
     features_router,
     filesystem_router,
+    github_config_router,
     projects_router,
     scaffold_router,
     schedules_router,
@@ -64,7 +67,7 @@ async def lifespan(app: FastAPI):
     """Lifespan context manager for startup and shutdown."""
     # Startup - clean up stale temp files (Playwright profiles, .node cache, etc.)
     try:
-        from temp_cleanup import cleanup_stale_temp
+        from core.temp_cleanup import cleanup_stale_temp
         stats = cleanup_stale_temp()
         if stats["dirs_deleted"] > 0 or stats["files_deleted"] > 0:
             mb_freed = stats["bytes_freed"] / (1024 * 1024)
@@ -106,7 +109,7 @@ logger = logging.getLogger(__name__)
 
 # Check if remote access is enabled via environment variable
 # Set by start_ui.py when --host is not 127.0.0.1
-ALLOW_REMOTE = os.environ.get("AUTOFORGE_ALLOW_REMOTE", "").lower() in ("1", "true", "yes")
+ALLOW_REMOTE = os.environ.get("SEAFORGE_ALLOW_REMOTE", "").lower() in ("1", "true", "yes")
 
 if ALLOW_REMOTE:
     logger.warning(
@@ -129,8 +132,8 @@ else:
         allow_origins=[
             "http://localhost:5173",      # Vite dev server
             "http://127.0.0.1:5173",
-            "http://localhost:8888",      # Production
-            "http://127.0.0.1:8888",
+            "http://localhost:30003",     # Production
+            "http://127.0.0.1:30003",
         ],
         allow_credentials=True,
         allow_methods=["*"],
@@ -145,7 +148,7 @@ else:
 if not ALLOW_REMOTE:
     @app.middleware("http")
     async def require_localhost(request: Request, call_next):
-        """Only allow requests from localhost (disabled when AUTOFORGE_ALLOW_REMOTE=1)."""
+        """Only allow requests from localhost (disabled when SEAFORGE_ALLOW_REMOTE=1)."""
         client_host = request.client.host if request.client else None
 
         # Allow localhost connections
@@ -159,6 +162,9 @@ if not ALLOW_REMOTE:
 # Include Routers
 # ============================================================================
 
+app.include_router(a2a_router)
+app.include_router(external_agents_router)
+app.include_router(github_config_router)
 app.include_router(projects_router)
 app.include_router(features_router)
 app.include_router(agent_router)
@@ -269,6 +275,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "server.main:app",
         host="127.0.0.1",  # Localhost only for security
-        port=8888,
+        port=30003,
         reload=True,
     )

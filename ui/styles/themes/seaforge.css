@@ -1,0 +1,181 @@
+/**
+ * SeaForge Theme
+ * Ocean-inspired color palette with teal, cyan, and deep navy tones
+ */
+
+:root[data-theme="seaforge"],
+:root {
+  /* Primary Colors - Ocean Teal Palette */
+  --color-primary: #2B7A8B;
+  --color-primary-dark: #1A3A47;
+  --color-primary-light: #3DD4E8;
+  
+  /* Accent Colors - Bright Cyan */
+  --color-accent: #3DD4E8;
+  --color-accent-light: #7DE5F5;
+  --color-accent-dark: #2B7A8B;
+  
+  /* Background Colors - Deep Navy/Teal */
+  --color-bg-primary: #0F2027;
+  --color-bg-secondary: #1A3A47;
+  --color-bg-tertiary: #1F2937;
+  --color-bg-card: #1A3A47;
+  --color-bg-hover: #2B7A8B;
+  
+  /* Text Colors */
+  --color-text-primary: #FFFFFF;
+  --color-text-secondary: #7DE5F5;
+  --color-text-muted: #8B9DAF;
+  --color-text-accent: #3DD4E8;
+  
+  /* Border Colors */
+  --color-border: #2B7A8B;
+  --color-border-light: #3DD4E8;
+  --color-border-dark: #1A3A47;
+  
+  /* Interactive States */
+  --color-hover: #3DD4E8;
+  --color-active: #7DE5F5;
+  --color-focus: #3DD4E8;
+  --color-disabled: #8B9DAF;
+  
+  /* Status Colors */
+  --color-success: #10B981;
+  --color-success-light: #34D399;
+  --color-warning: #F59E0B;
+  --color-warning-light: #FBBF24;
+  --color-error: #EF4444;
+  --color-error-light: #F87171;
+  --color-info: #3DD4E8;
+  --color-info-light: #7DE5F5;
+  
+  /* Shadows & Effects */
+  --shadow-sm: 0 1px 2px rgba(15, 32, 39, 0.3);
+  --shadow-md: 0 4px 6px rgba(15, 32, 39, 0.5);
+  --shadow-lg: 0 10px 15px rgba(15, 32, 39, 0.6);
+  --shadow-xl: 0 20px 25px rgba(15, 32, 39, 0.7);
+  --shadow-glow: 0 0 20px rgba(61, 212, 232, 0.3);
+  --shadow-glow-strong: 0 0 30px rgba(61, 212, 232, 0.5);
+  
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #2B7A8B 0%, #3DD4E8 100%);
+  --gradient-accent: linear-gradient(135deg, #3DD4E8 0%, #7DE5F5 100%);
+  --gradient-wave: linear-gradient(135deg, #2B7A8B 0%, #3DD4E8 50%, #7DE5F5 100%);
+  --gradient-dark: linear-gradient(180deg, #0F2027 0%, #1A3A47 100%);
+  
+  /* Spacing (if needed) */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  
+  /* Transitions */
+  --transition-fast: 150ms ease-in-out;
+  --transition-normal: 250ms ease-in-out;
+  --transition-slow: 350ms ease-in-out;
+}
+
+/* Apply theme to body */
+body[data-theme="seaforge"],
+body {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* Glow effects for interactive elements */
+.seaforge-glow {
+  box-shadow: var(--shadow-glow);
+}
+
+.seaforge-glow-strong {
+  box-shadow: var(--shadow-glow-strong);
+}
+
+/* Wave gradient backgrounds */
+.seaforge-wave-bg {
+  background: var(--gradient-wave);
+}
+
+.seaforge-primary-bg {
+  background: var(--gradient-primary);
+}
+
+/* Text with gradient */
+.seaforge-text-gradient {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card styling */
+.seaforge-card {
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-normal);
+}
+
+.seaforge-card:hover {
+  border-color: var(--color-border-light);
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+/* Button styling */
+.seaforge-button {
+  background: var(--gradient-primary);
+  color: var(--color-text-primary);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+}
+
+.seaforge-button:hover {
+  box-shadow: var(--shadow-glow);
+  transform: translateY(-1px);
+}
+
+.seaforge-button:active {
+  transform: translateY(0);
+}
+
+/* Input styling */
+.seaforge-input {
+  background-color: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  padding: var(--spacing-sm) var(--spacing-md);
+  transition: all var(--transition-fast);
+}
+
+.seaforge-input:focus {
+  outline: none;
+  border-color: var(--color-focus);
+  box-shadow: 0 0 0 3px rgba(61, 212, 232, 0.2);
+}
+
+/* Link styling */
+.seaforge-link {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.seaforge-link:hover {
+  color: var(--color-accent-light);
+  text-decoration: underline;
+}

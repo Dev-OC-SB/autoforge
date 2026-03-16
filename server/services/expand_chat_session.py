@@ -108,7 +108,7 @@ class ExpandChatSession:
             return
 
         # Verify project has existing spec
-        from autoforge_paths import get_prompts_dir
+        from core.autoforge_paths import get_prompts_dir
         spec_path = get_prompts_dir(self.project_dir) / "app_spec.txt"
         if not spec_path.exists():
             yield {
@@ -147,7 +147,7 @@ class ExpandChatSession:
                 ],
             },
         }
-        from autoforge_paths import get_expand_settings_path
+        from core.autoforge_paths import get_expand_settings_path
         settings_file = get_expand_settings_path(self.project_dir, uuid.uuid4().hex)
         settings_file.parent.mkdir(parents=True, exist_ok=True)
         self._settings_file = settings_file
@@ -159,7 +159,7 @@ class ExpandChatSession:
         system_prompt = skill_content.replace("$ARGUMENTS", project_path)
 
         # Build environment overrides for API configuration
-        from registry import DEFAULT_MODEL, get_effective_sdk_env
+        from core.registry import DEFAULT_MODEL, get_effective_sdk_env
         sdk_env = get_effective_sdk_env()
 
         # Determine model from SDK env (provider-aware) or fallback to env/default

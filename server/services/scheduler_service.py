@@ -74,7 +74,7 @@ class SchedulerService:
 
     async def _load_all_schedules(self):
         """Load schedules for all registered projects."""
-        from registry import list_registered_projects
+        from core.registry import list_registered_projects
 
         try:
             projects = list_registered_projects()
@@ -92,7 +92,7 @@ class SchedulerService:
     async def _load_project_schedules(self, project_name: str, project_dir: Path) -> int:
         """Load schedules for a single project. Returns count of schedules loaded."""
         from api.database import Schedule, create_database
-        from autoforge_paths import get_features_db_path
+        from core.autoforge_paths import get_features_db_path
 
         db_path = get_features_db_path(project_dir)
         if not db_path.exists():
@@ -547,7 +547,7 @@ class SchedulerService:
 
     async def _check_missed_windows_on_startup(self):
         """Called on server start. Start agents for any active windows."""
-        from registry import list_registered_projects
+        from core.registry import list_registered_projects
 
         try:
             now = datetime.now(timezone.utc)
@@ -568,7 +568,7 @@ class SchedulerService:
     ):
         """Check if a project should be started on server startup."""
         from api.database import Schedule, ScheduleOverride, create_database
-        from autoforge_paths import get_features_db_path
+        from core.autoforge_paths import get_features_db_path
 
         db_path = get_features_db_path(project_dir)
         if not db_path.exists():

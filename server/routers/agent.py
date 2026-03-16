@@ -28,7 +28,7 @@ def _get_settings_defaults() -> tuple[bool, str, int, bool, int]:
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
 
-    from registry import DEFAULT_MODEL, get_all_settings
+    from core.registry import DEFAULT_MODEL, get_all_settings
 
     settings = get_all_settings()
     yolo_mode = (settings.get("yolo_mode") or "false").lower() == "true"

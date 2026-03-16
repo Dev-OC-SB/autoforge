@@ -1,10 +1,10 @@
 {
-  "name": "autoforge-ai",
+  "name": "seaforge-ai",
   "version": "0.1.16",
   "description": "Autonomous coding agent with web UI - build complete apps with AI",
   "license": "AGPL-3.0",
   "bin": {
-    "autoforge": "./bin/autoforge.js"
+    "seaforge": "./bin/seaforge.js"
   },
   "type": "module",
   "engines": {
@@ -25,7 +25,7 @@
     "start.py",
     "agent.py",
     "auth.py",
-    "autoforge_paths.py",
+    "seaforge_paths.py",
     "autonomous_agent_demo.py",
     "client.py",
     "env_constants.py",

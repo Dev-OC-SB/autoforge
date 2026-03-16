@@ -35,7 +35,7 @@ _root = Path(__file__).parent.parent.parent
 if str(_root) not in sys.path:
     sys.path.insert(0, str(_root))
 
-from security import extract_commands, get_effective_commands, is_command_allowed
+from core.security import extract_commands, get_effective_commands, is_command_allowed
 
 logger = logging.getLogger(__name__)
 

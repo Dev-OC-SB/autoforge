@@ -47,8 +47,8 @@ def _init_imports():
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
 
-    from progress import count_passing_tests
-    from prompts import get_project_prompts_dir, scaffold_project_prompts
+    from core.progress import count_passing_tests
+    from core.prompts import get_project_prompts_dir, scaffold_project_prompts
     from start import check_spec_exists
 
     _check_spec_exists = check_spec_exists
@@ -65,7 +65,7 @@ def _get_registry_functions():
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
 
-    from registry import (
+    from core.registry import (
         get_project_concurrency,
         get_project_path,
         list_registered_projects,
@@ -276,7 +276,7 @@ async def delete_project(name: str, delete_files: bool = False):
         raise HTTPException(status_code=404, detail=f"Project '{name}' not found")
 
     # Check if agent is running
-    from autoforge_paths import has_agent_running
+    from core.autoforge_paths import has_agent_running
     if has_agent_running(project_dir):
         raise HTTPException(
             status_code=409,
@@ -407,7 +407,7 @@ async def reset_project(name: str, full_reset: bool = False):
         raise HTTPException(status_code=404, detail="Project directory not found")
 
     # Check if agent is running
-    from autoforge_paths import has_agent_running
+    from core.autoforge_paths import has_agent_running
     if has_agent_running(project_dir):
         raise HTTPException(
             status_code=409,
@@ -424,7 +424,7 @@ async def reset_project(name: str, full_reset: bool = False):
 
     deleted_files: list[str] = []
 
-    from autoforge_paths import (
+    from core.autoforge_paths import (
         get_assistant_db_path,
         get_claude_assistant_settings_path,
         get_claude_settings_path,
@@ -466,7 +466,7 @@ async def reset_project(name: str, full_reset: bool = False):
 
     # Full reset: also delete prompts directory
     if full_reset:
-        from autoforge_paths import get_prompts_dir
+        from core.autoforge_paths import get_prompts_dir
         # Delete prompts from both possible locations
         for prompts_dir in [get_prompts_dir(project_dir), project_dir / "prompts"]:
             if prompts_dir.exists():

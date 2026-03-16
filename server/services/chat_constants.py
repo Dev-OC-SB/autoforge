@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, AsyncGenerator
 
 # -------------------------------------------------------------------
-# Root directory of the autoforge project (repository root).
+# Root directory of the seaforge project (repository root).
 # Used throughout the server package whenever the repo root is needed.
 # -------------------------------------------------------------------
 ROOT_DIR = Path(__file__).parent.parent.parent
@@ -32,8 +32,8 @@ if _root_str not in sys.path:
 # Re-exported here so existing ``from .chat_constants import API_ENV_VARS``
 # imports continue to work unchanged.
 # -------------------------------------------------------------------
-from env_constants import API_ENV_VARS  # noqa: E402, F401
-from rate_limit_utils import is_rate_limit_error, parse_retry_after  # noqa: E402, F401
+from core.env_constants import API_ENV_VARS  # noqa: E402, F401
+from core.rate_limit_utils import is_rate_limit_error, parse_retry_after  # noqa: E402, F401
 
 logger = logging.getLogger(__name__)
 

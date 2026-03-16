@@ -95,6 +95,155 @@ class Feature(Base):
         return []
 
 
+class GitHubConfig(Base):
+    """GitHub configuration per project for git operations."""
+
+    __tablename__ = "github_configs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, nullable=False, unique=True)
+
+    # GitHub repository
+    repo_url = Column(String(500), nullable=False)
+    auth_token = Column(String(500), nullable=False)  # Encrypted
+
+    # Task tracking
+    task_code = Column(String(20), nullable=False)
+    current_task_id = Column(Integer, nullable=False, default=0)
+    last_branch = Column(String(200), nullable=True)
+
+    # Git identity (for internal agents)
+    git_user_name = Column(String(100), nullable=True, default="SeaForge")
+    git_user_email = Column(String(100), nullable=True, default="agents@seaforge.ai")
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "repo_url": self.repo_url,
+            "task_code": self.task_code,
+            "current_task_id": self.current_task_id,
+            "last_branch": self.last_branch,
+            "git_user_name": self.git_user_name,
+            "git_user_email": self.git_user_email,
+        }
+
+
+class ExternalAgent(Base):
+    """External agent configuration for A2A communication."""
+
+    __tablename__ = "external_agents"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, nullable=False)
+
+    # Agent identification
+    name = Column(String(100), nullable=False)
+    agent_type = Column(String(50), nullable=False, default="agent_zero")
+
+    # Network configuration
+    connection_type = Column(String(50), nullable=False, default="docker_network")
+    container_name = Column(String(100), nullable=True)
+    host = Column(String(255), nullable=True)
+    port = Column(Integer, nullable=False, default=50001)
+    use_ssl = Column(Boolean, nullable=False, default=False)
+    url_override = Column(String(500), nullable=True)
+
+    # Authentication
+    api_token = Column(String(500), nullable=False)  # Encrypted
+
+    # Capabilities
+    capabilities = Column(JSON, nullable=False, default=["gitbot", "git-operations"])
+
+    # Status
+    enabled = Column(Boolean, nullable=False, default=True)
+    last_connected = Column(DateTime, nullable=True)
+
+    @property
+    def base_url(self) -> str:
+        """Get the base URL for this agent."""
+        if self.url_override:
+            return self.url_override
+
+        if self.connection_type == "docker_network":
+            protocol = "https" if self.use_ssl else "http"
+            return f"{protocol}://{self.container_name}:{self.port}"
+
+        elif self.connection_type in ["direct_ip", "domain"]:
+            protocol = "https" if self.use_ssl or self.port == 443 else "http"
+            return f"{protocol}://{self.host}:{self.port}"
+
+        return f"http://localhost:{self.port}"
+
+    @property
+    def a2a_url(self) -> str:
+        """Get the A2A endpoint URL."""
+        return f"{self.base_url}/a2a/t-{self.api_token}"
+
+    @property
+    def stream_url(self) -> str:
+        """Get the SSE stream URL."""
+        return f"{self.base_url}/a2a/stream"
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "name": self.name,
+            "agent_type": self.agent_type,
+            "connection_type": self.connection_type,
+            "container_name": self.container_name,
+            "host": self.host,
+            "port": self.port,
+            "use_ssl": self.use_ssl,
+            "url_override": self.url_override,
+            "capabilities": self.capabilities,
+            "enabled": self.enabled,
+            "last_connected": self.last_connected.isoformat() if self.last_connected else None,
+            "base_url": self.base_url,
+        }
+
+
+class ErrorLog(Base):
+    """Error log for tracking git operations and agent failures."""
+
+    __tablename__ = "error_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    project_id = Column(Integer, nullable=False, index=True)
+
+    # Error details
+    error_type = Column(String(50), nullable=False)  # "git_operation", "agent_failure", etc.
+    error_message = Column(String(2000), nullable=False)
+    context = Column(JSON, nullable=False)  # Full error context
+
+    # Retry tracking
+    retry_count = Column(Integer, nullable=False, default=0)
+
+    # Resolution
+    resolved = Column(Boolean, nullable=False, default=False, index=True)
+    github_issue_url = Column(String(500), nullable=True)
+
+    # Metadata
+    created_at = Column(DateTime, nullable=False, default=_utc_now)
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        return {
+            "id": self.id,
+            "project_id": self.project_id,
+            "error_type": self.error_type,
+            "error_message": self.error_message,
+            "context": self.context,
+            "retry_count": self.retry_count,
+            "resolved": self.resolved,
+            "github_issue_url": self.github_issue_url,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+        }
+
+
 class Schedule(Base):
     """Time-based schedule for automated agent start/stop."""
 
@@ -192,7 +341,7 @@ class ScheduleOverride(Base):
 
 def get_database_path(project_dir: Path) -> Path:
     """Return the path to the SQLite database for a project."""
-    from autoforge_paths import get_features_db_path
+    from core.autoforge_paths import get_features_db_path
     return get_features_db_path(project_dir)
 
 
@@ -360,6 +509,39 @@ def _migrate_add_schedules_tables(engine) -> None:
                 conn.commit()
 
 
+def _migrate_add_github_config_table(engine) -> None:
+    """Create github_configs table if it doesn't exist."""
+    from sqlalchemy import inspect
+
+    inspector = inspect(engine)
+    existing_tables = inspector.get_table_names()
+
+    if "github_configs" not in existing_tables:
+        GitHubConfig.__table__.create(bind=engine)  # type: ignore[attr-defined]
+
+
+def _migrate_add_external_agents_table(engine) -> None:
+    """Create external_agents table if it doesn't exist."""
+    from sqlalchemy import inspect
+
+    inspector = inspect(engine)
+    existing_tables = inspector.get_table_names()
+
+    if "external_agents" not in existing_tables:
+        ExternalAgent.__table__.create(bind=engine)  # type: ignore[attr-defined]
+
+
+def _migrate_add_error_logs_table(engine) -> None:
+    """Create error_logs table if it doesn't exist."""
+    from sqlalchemy import inspect
+
+    inspector = inspect(engine)
+    existing_tables = inspector.get_table_names()
+
+    if "error_logs" not in existing_tables:
+        ErrorLog.__table__.create(bind=engine)  # type: ignore[attr-defined]
+
+
 def _configure_sqlite_immediate_transactions(engine) -> None:
     """Configure engine for IMMEDIATE transactions via event hooks.
 
@@ -409,7 +591,7 @@ def create_database(project_dir: Path) -> tuple:
 
     db_url = get_database_url(project_dir)
 
-    # Ensure parent directory exists (for .autoforge/ layout)
+    # Ensure parent directory exists (for .seaforge/ layout)
     db_path = get_database_path(project_dir)
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -453,6 +635,11 @@ def create_database(project_dir: Path) -> tuple:
 
     # Migrate to add schedules tables
     _migrate_add_schedules_tables(engine)
+
+    # Migrate to add GitHub and external agent tables
+    _migrate_add_github_config_table(engine)
+    _migrate_add_external_agents_table(engine)
+    _migrate_add_error_logs_table(engine)
 
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 

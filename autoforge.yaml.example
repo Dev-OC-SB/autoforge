@@ -1,0 +1,59 @@
+# AutoForge Multi-Provider Configuration
+# ========================================
+# 
+# This file demonstrates how to configure AutoForge with multiple LLM providers.
+# Copy this file to autoforge.yaml or ~/.autoforge/config.yaml and customize.
+
+# Provider Selection
+# ------------------
+# Options: auto, ollama, openrouter, openai
+# "auto" will select the first available provider in priority order:
+# Ollama → OpenRouter → OpenAI
+default_provider: auto
+
+# Ollama Configuration (Local Models)
+# ------------------------------------
+# Free, runs locally, no API key needed
+# Install: https://ollama.com
+ollama:
+  enabled: true
+  base_url: http://localhost:11434
+  default_model: codellama:13b
+  timeout: 300
+
+# OpenRouter Configuration (Multi-Provider API)
+# ----------------------------------------------
+# Access to multiple LLM providers through one API
+# Sign up: https://openrouter.ai
+openrouter:
+  enabled: false
+  api_key: ${OPENROUTER_API_KEY}  # Or set directly: sk-or-v1-...
+  base_url: https://openrouter.ai/api/v1
+  default_model: anthropic/claude-3.5-sonnet
+  site_url: https://autoforge.ai
+  app_name: AutoForge
+
+# OpenAI Configuration (OpenAI-Compatible APIs)
+# ----------------------------------------------
+# Works with OpenAI, Azure OpenAI, and compatible APIs
+openai:
+  enabled: false
+  api_key: ${OPENAI_API_KEY}  # Or set directly: sk-...
+  base_url: https://api.openai.com/v1
+  default_model: gpt-4-turbo
+  organization: null  # Optional organization ID
+
+# Server Settings
+# ---------------
+server_host: 127.0.0.1
+server_port: 8888
+
+# Agent Settings
+# --------------
+max_tokens: 4096
+temperature: 0.7
+
+# Optional Integrations
+# ---------------------
+# N8N webhook for progress notifications
+n8n_webhook_url: null

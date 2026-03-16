@@ -35,8 +35,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 
-const STORAGE_KEY = 'autoforge-selected-project'
-const VIEW_MODE_KEY = 'autoforge-view-mode'
+const STORAGE_KEY = 'seaforge-selected-project'
+const VIEW_MODE_KEY = 'seaforge-view-mode'
 
 // Bottom padding for main content when debug panel is collapsed (40px header + 8px margin)
 const COLLAPSED_DEBUG_PANEL_CLEARANCE = 48
@@ -268,9 +268,9 @@ function App() {
             <div className="flex items-center gap-3">
               {/* Logo and Title */}
               <div className="flex items-center gap-2 shrink-0">
-                <img src="/logo.png" alt="AutoForge" className="h-9 w-9 rounded-full" />
+                <img src="/seaforge-logo.png" alt="SeaForge" className="h-9 w-9 rounded-full" />
                 <h1 className="font-display text-2xl font-bold tracking-tight uppercase hidden md:block">
-                  AutoForge
+                  SeaForge
                 </h1>
               </div>
 
@@ -311,7 +311,7 @@ function App() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => window.open('https://autoforge.cc', '_blank')}
+                    onClick={() => window.open('https://github.com/SeaForgeAI/autoforge', '_blank')}
                     variant="outline"
                     size="sm"
                     aria-label="Open Documentation"
@@ -402,7 +402,7 @@ function App() {
         {!selectedProject ? (
           <div className="text-center mt-12">
             <h2 className="font-display text-2xl font-bold mb-2">
-              Welcome to AutoForge
+              Welcome to SeaForge
             </h2>
             <p className="text-muted-foreground mb-4">
               Select a project from the dropdown above or create a new one to get started.

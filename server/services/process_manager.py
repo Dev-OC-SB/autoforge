@@ -21,8 +21,8 @@ import psutil
 
 # Add parent directory to path for shared module imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from auth import AUTH_ERROR_HELP_SERVER as AUTH_ERROR_HELP  # noqa: E402
-from auth import is_auth_error
+from core.auth import AUTH_ERROR_HELP_SERVER as AUTH_ERROR_HELP  # noqa: E402
+from core.auth import is_auth_error
 from server.utils.process_utils import kill_process_tree
 
 logger = logging.getLogger(__name__)
@@ -92,7 +92,7 @@ class AgentProcessManager:
         self._callbacks_lock = threading.Lock()
 
         # Lock file to prevent multiple instances (stored in project directory)
-        from autoforge_paths import get_agent_lock_path
+        from core.autoforge_paths import get_agent_lock_path
         self.lock_file = get_agent_lock_path(self.project_dir)
 
     @property
@@ -257,7 +257,7 @@ class AgentProcessManager:
         Reset them so they can be picked up on next agent start.
         """
         try:
-            from autoforge_paths import get_features_db_path
+            from core.autoforge_paths import get_features_db_path
             features_db = get_features_db_path(self.project_dir)
             if not features_db.exists():
                 return
@@ -360,7 +360,7 @@ class AgentProcessManager:
                 self._remove_lock()
                 # Clean up drain signal file if present
                 try:
-                    from autoforge_paths import get_pause_drain_path
+                    from core.autoforge_paths import get_pause_drain_path
                     get_pause_drain_path(self.project_dir).unlink(missing_ok=True)
                 except Exception:
                     pass
@@ -451,7 +451,7 @@ class AgentProcessManager:
             # CREATE_NO_WINDOW on Windows prevents console window pop-ups
             # PYTHONUNBUFFERED ensures output isn't delayed
             # Build subprocess environment with API provider settings
-            from registry import get_effective_sdk_env
+            from core.registry import get_effective_sdk_env
             api_env = get_effective_sdk_env()
             subprocess_env = {
                 **os.environ,
@@ -540,7 +540,7 @@ class AgentProcessManager:
             self._remove_lock()
             # Clean up drain signal file if present
             try:
-                from autoforge_paths import get_pause_drain_path
+                from core.autoforge_paths import get_pause_drain_path
                 get_pause_drain_path(self.project_dir).unlink(missing_ok=True)
             except Exception:
                 pass
@@ -617,7 +617,7 @@ class AgentProcessManager:
             return False, "Agent is not running"
 
         try:
-            from autoforge_paths import get_pause_drain_path
+            from core.autoforge_paths import get_pause_drain_path
             drain_path = get_pause_drain_path(self.project_dir)
             drain_path.parent.mkdir(parents=True, exist_ok=True)
             drain_path.write_text(str(self.process.pid))
@@ -637,7 +637,7 @@ class AgentProcessManager:
             return False, "Agent is not in a graceful pause state"
 
         try:
-            from autoforge_paths import get_pause_drain_path
+            from core.autoforge_paths import get_pause_drain_path
             get_pause_drain_path(self.project_dir).unlink(missing_ok=True)
             self.status = "running"
             return True, "Agent resumed from graceful pause"
@@ -664,7 +664,7 @@ class AgentProcessManager:
                 self._cleanup_stale_features()
                 # Clean up drain signal file if present
                 try:
-                    from autoforge_paths import get_pause_drain_path
+                    from core.autoforge_paths import get_pause_drain_path
                     get_pause_drain_path(self.project_dir).unlink(missing_ok=True)
                 except Exception:
                     pass
@@ -742,7 +742,7 @@ def cleanup_orphaned_locks() -> int:
     if str(root) not in sys.path:
         sys.path.insert(0, str(root))
 
-    from registry import list_registered_projects
+    from core.registry import list_registered_projects
 
     cleaned = 0
     try:
@@ -753,7 +753,7 @@ def cleanup_orphaned_locks() -> int:
                 continue
 
             # Clean up stale drain signal files
-            from autoforge_paths import get_autoforge_dir, get_pause_drain_path
+            from core.autoforge_paths import get_seaforge_dir, get_pause_drain_path
             drain_file = get_pause_drain_path(project_path)
             if drain_file.exists():
                 drain_file.unlink(missing_ok=True)
@@ -762,7 +762,7 @@ def cleanup_orphaned_locks() -> int:
             # Check both legacy and new locations for lock files
             lock_locations = [
                 project_path / ".agent.lock",
-                get_autoforge_dir(project_path) / ".agent.lock",
+                get_seaforge_dir(project_path) / ".agent.lock",
             ]
             lock_file = None
             for candidate in lock_locations:
